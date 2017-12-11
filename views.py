@@ -7,8 +7,6 @@ import random
 import uuid
 import hashlib
 
-# base是基本类，其他都是继承它
-# 方法db是所有db操作
 class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
@@ -18,7 +16,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        # 判断 current_user, 如果不存在值,要求重定向到 login页面
+        
         if not self.current_user:
             self.render('login.html')
             return
