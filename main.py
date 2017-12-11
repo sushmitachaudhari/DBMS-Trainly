@@ -6,7 +6,7 @@ import torndb
 import tornado.options
 from handlers import HANDLERS,TEMPLATE_PATH
 
-# 定义数据库初始化配置
+
 define("port", default=8000, type=int)
 define("mysql_host",default="127.0.0.1:3306",help="blog database host")
 define("mysql_database",default="project",help="blog database name")
