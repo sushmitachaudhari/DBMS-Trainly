@@ -7,6 +7,8 @@ import random
 import uuid
 import hashlib
 
+# base是基本类，其他都是继承它
+# 方法db是所有db操作
 class BaseHandler(tornado.web.RequestHandler):
     @property
     def db(self):
@@ -16,7 +18,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        
+        # 判断 current_user, 如果不存在值,要求重定向到 login页面
         if not self.current_user:
             self.render('login.html')
             return
@@ -221,3 +223,44 @@ class HistoryResHandler(BaseHandler):
         ui = tornado.escape.xhtml_escape(self.current_user)
         ret = self.db.query('SELECT u.UserId, u.FirstName, u.LastName,c.CourseId,c.Name,ec.CourseStatus,ec.date,ec.`Payment Code`,SUM(c.cost) AS Total  FROM (User u INNER JOIN EnrollCourse ec ON u.UserId = ec.UserId) INNER JOIN Course c ON ec.CourseId = c.CourseId WHERE u.UserId=%s GROUP BY u.UserId,c.CourseId',ui)
         self.render('historyres.html', ret=ret)
+
+class TpstuHandler(BaseHandler): # Put this link in admin page, link should be top performing student
+    def get(self):
+        ret = self.db.query('SELECT u.UserId,c.CourseId,c.Name,AVG(co.TotalScore) AS avg_score FROM (User u INNER JOIN EnrollCourse ec ON u.UserId = ec.UserId) INNER JOIN Course c ON ec.CourseId = c.CourseId INNER JOIN Completion co ON (co.CourseId= ec.CourseId  AND co.UserId=ec.UserId)  WHERE ec.coursestatus =%s GROUP BY u.UserId,c.CourseId HAVING AVG(co.TotalScore) > 92 ORDER BY avg_score DESC; ','Complete')
+        self.render('tpstu.html', ret=ret)
+
+class UfcourseHandler(BaseHandler):
+    def get(self):
+        self.render('ufcourse.html')
+
+class UfcourseResHandler(BaseHandler): # Put this link in admin page, link Unfinished courses
+    def post(self):
+        si = self.get_argument('ui')
+        ret = self.db.query('SELECT q.id,q.cid,co.status,q.mtl,q.type FROM ( SELECT u.UserId AS id,c.CourseId AS cid,m.Name as mtl,m.MaterialType as type,m.order as ord  FROM (User u  INNER JOIN EnrollCourse ec ON u.UserId = ec.UserId) INNER JOIN Course c ON ec.CourseId = c.CourseId INNER JOIN Material m ON c.CourseId = m.CourseId  WHERE u.UserId = %s) q  INNER JOIN Completion co ON (q.cid=co.CourseId AND q.id = co.UserId AND q.ord = co.order) WHERE co.status=%s',si,'Notcompleted')
+        self.render('ufcourseres.html', ret=ret)
+
+class PopqueHandler(BaseHandler): # Put this link in admin page, link should be top performing student
+    def get(self):
+        ret = self.db.query('SELECT ques.course,ques.courseid,ques.type,ques.qid,SUM(ques.totallike) AS likes ,ques.ord FROM ( SELECT DISTINCT c.Name as course,c.CourseId as courseid,m.Order as ord,m.MaterialType as type,q.questionId as qid,q.TotalLike as totallike FROM (course c INNER JOIN material m ON c.CourseId = m.CourseId) INNER JOIN question q ON (m.order = q.MOrderId AND q.MCourseId=m.CourseId)) ques INNER JOIN answer ans ON ques.qid=ans.questionId GROUP BY ques.qid HAVING SUM(ques.totallike)>10 ORDER BY likes DESC')
+        self.render('popque.html', ret=ret)
+
+class AvgrateHandler(BaseHandler):
+    def get(self):
+        self.render('avgrate.html')
+
+class AvgrateResHandler(BaseHandler): # Put this link in admin page, link Unfinished courses
+    def post(self):
+        ui = self.get_argument('ui')
+        ci = self.get_argument('ci')
+        ret = self.db.query('SELECT c.CourseId,AVG(co.rating) as rating FROM (create_course cc INNER JOIN course c  ON cc.CourseId=c.CourseId) INNER JOIN enrollcourse ec ON ec.CourseId = c.CourseId INNER JOIN completion co ON c.CourseId =  co.CourseId WHERE (co.status=%s) AND (cc.UserId=%s) AND (c.courseId=%s) ORDER BY rating DESC;','completed',ui,ci)
+        self.render('avgrateres.html', ret=ret)
+
+class AvgcopHandler(BaseHandler):
+    def get(self):
+        self.render('avgcop.html')
+
+class AvgcopResHandler(BaseHandler): # Put this link in admin page, link Unfinished courses
+    def post(self):
+        ui = self.get_argument('ui')
+        ret = self.db.query('SELECT c.courseId AS Courseid,AVG(co.TotalScore) AS avg_score FROM (create_course cc INNER JOIN course c  ON cc.CourseId=c.CourseId) INNER JOIN enrollcourse ec ON ec.CourseId = c.CourseId INNER JOIN completion co ON c.CourseId =  co.CourseId  WHERE (ec.CourseStatus = %s) AND cc.UserId=%s GROUP BY Courseid','complete',ui)
+        self.render('avgcopres.html', ret=ret)

@@ -24,5 +24,14 @@ HANDLERS = [
     (r'/ccompleteres', CCompleteResHandler),
     (r'/certificate', CertificateHandler),
     (r'/certificateres', CertificateResHandler),
-    (r'/historyres', HistoryResHandler)
+    (r'/historyres', HistoryResHandler),
+    (r'/tpstu', TpstuHandler),
+    (r'/ufcourse', UfcourseHandler),
+    (r'/ufcourseres', UfcourseResHandler),
+    (r'/popque', PopqueHandler),
+    (r'/avgrate', AvgrateHandler),
+    (r'/avgrateres', AvgrateResHandler),
+    (r'/avgcop', AvgcopHandler),
+    (r'/avgcopres', AvgcopResHandler)
+
 ]
