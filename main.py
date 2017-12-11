@@ -18,18 +18,18 @@ class Application(web.Application):
     def __init__(self):
         handlers = HANDLERS
         settings = dict(
-            # 模板路径
+          
             template_path = TEMPLATE_PATH,
             static_path=os.path.join(os.path.dirname(__file__), "static"),
-            # 防跨站攻击的设置
+         
             xsrf_cookies = False,
-            # 就是cookie的密钥，是根据py一个小算法"base64"获得的
+            
             # cmd python：print base64.b64encode(uuid.uuid4().bytes+uuid.uuid4().bytes)
             cookie_secret="tmxvMsfgRHqV61E6iZ/pJcVRAiHQZEmehIFLhNJtvYM=",
         )
-        # Application初始化
+        # Application
         web.Application.__init__(self,handlers,**settings)
-        # db链接,App init时会紧接着做
+        
         self.db = torndb.Connection(
             host= options.mysql_host,database=options.mysql_database,
             user= options.mysql_user,password=None)
