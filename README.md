@@ -36,3 +36,5 @@ templates directory includes all the html files, which will present differnt pag
 static directory includes css file that define the style used in html files.
 
 
+DEMO VIDEO:
+https://www.youtube.com/watch?v=ywgwDgic9z0&feature=youtu.be
