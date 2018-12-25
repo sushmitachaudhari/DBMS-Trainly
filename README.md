@@ -1,5 +1,5 @@
 # cs5200-Trainly
-Project : This project was done in the course CS5200 - Database Management System at Northeastern University.
+Project : This project was done in the course CS5200 - Database Management System at Northeastern University. The project narrative can be found in narrative.pdf file.
 
 #How to Install
 
