@@ -1,5 +1,5 @@
 # cs5200-Trainly
-Project
+Project : This project was done in the course CS5200 - Database Management System at Northeastern University.
 
 #How to Install
 
